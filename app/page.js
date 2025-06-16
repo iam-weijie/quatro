@@ -22,18 +22,31 @@ export default function Home() {
   }
 
   function checkWin(r, c) {
-    const directions = [
-      [...Array(BOARD_SIZE).keys()].map((i) => [r, i]),
-      [...Array(BOARD_SIZE).keys()].map((i) => [i, c]),
-      [...Array(BOARD_SIZE).keys()].map((i) => [i, i]),
-      [...Array(BOARD_SIZE).keys()].map((i) => [i, BOARD_SIZE - 1 - i]),
-    ];
+    // We need to use the updated board state, not the old one
+    const currentBoard = [...board];
+    currentBoard[r][c] = selectedPiece;
 
-    for (let line of directions) {
-      const pieces = line.map(([x, y]) => board[x][y]);
-      if (shareTrait(pieces)) return true;
+    // Check horizontal line
+    const horizontal = [...Array(BOARD_SIZE).keys()].map((i) => currentBoard[r][i]);
+    if (shareTrait(horizontal)) return true;
+
+    // Check vertical line
+    const vertical = [...Array(BOARD_SIZE).keys()].map((i) => currentBoard[i][c]);
+    if (shareTrait(vertical)) return true;
+
+    // Check main diagonal (if the placed piece is on it)
+    if (r === c) {
+      const mainDiagonal = [...Array(BOARD_SIZE).keys()].map((i) => currentBoard[i][i]);
+      if (shareTrait(mainDiagonal)) return true;
     }
 
+    // Check anti-diagonal (if the placed piece is on it)
+    if (r + c === BOARD_SIZE - 1) {
+      const antiDiagonal = [...Array(BOARD_SIZE).keys()].map((i) => currentBoard[i][BOARD_SIZE - 1 - i]);
+      if (shareTrait(antiDiagonal)) return true;
+    }
+
+    // Check all possible 2x2 blocks that include the placed piece
     const blocks = [];
     if (r > 0 && c > 0) blocks.push([[r - 1, c - 1], [r - 1, c], [r, c - 1], [r, c]]);
     if (r > 0 && c < BOARD_SIZE - 1) blocks.push([[r - 1, c], [r - 1, c + 1], [r, c], [r, c + 1]]);
@@ -41,7 +54,7 @@ export default function Home() {
     if (r < BOARD_SIZE - 1 && c < BOARD_SIZE - 1) blocks.push([[r, c], [r, c + 1], [r + 1, c], [r + 1, c + 1]]);
 
     for (let block of blocks) {
-      const pieces = block.map(([x, y]) => board[x][y]);
+      const pieces = block.map(([x, y]) => currentBoard[x][y]);
       if (shareTrait(pieces)) return true;
     }
 
