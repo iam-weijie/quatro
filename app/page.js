@@ -19,29 +19,30 @@ export default function Home() {
   ) : (
     <div style={{ padding: 20, fontFamily: "sans-serif", maxWidth: 600, margin: "0 auto" }}>
       <h1>Welcome to Quatro</h1>
+      <br/>
       <h2>🎯 Goal:</h2>
       <p>Outsmart your opponent by being the first to align 4 pieces in a row or form a 2×2 block.</p>
-
+      <br/>
       <h2>🏆 Win conditions:</h2>
       <ul>
         <li>4 pieces sharing a trait (color or shape) in a row, column, or diagonal</li>
         <li>OR 4 in a 2×2 square block</li>
       </ul>
-
+      <br/>
       <h2>🎲 Pieces:</h2>
       <p>Each piece has:</p>
       <ul>
         <li>Color: black or white</li>
         <li>Shape: circle or square</li>
       </ul>
-
+      <br/>
       <h2>🕹 How to Play:</h2>
       <ol>
         <li>Player 1 selects a piece for Player 2 to place</li>
         <li>Player 2 places it on the board, then picks a piece for Player 1</li>
         <li>Repeat until someone wins or the board fills</li>
       </ol>
-
+      <br/>
       <h2>👥 Enter Player Names</h2>
       <input
         placeholder="Player 1 Name"
