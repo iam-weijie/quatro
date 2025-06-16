@@ -21,7 +21,7 @@ export default function Home() {
       <h1>Welcome to Quatro</h1>
       <br/>
       <h2>🎯 Goal:</h2>
-      <p>Outsmart your opponent by being the first to align 4 pieces in a row or form a 2×2 block.</p>
+      <p>Outsmart your opponent by being the first to align 4 pieces in a row or form a 2×2 block</p>
       <br/>
       <h2>🏆 Win conditions:</h2>
       <ul>
@@ -38,12 +38,12 @@ export default function Home() {
       <br/>
       <h2>🕹 How to Play:</h2>
       <ol>
-        <li>Player 1 selects a piece for Player 2 to place</li>
-        <li>Player 2 places it on the board, then picks a piece for Player 1</li>
-        <li>Repeat until someone wins or the board fills</li>
+        <li>Players take turns selecting a piece to place on the board</li>
+        <li>You can’t use the same space twice</li>
+        <li>Keep playing until someone wins — or the board fills up (draw!)</li>
       </ol>
       <br/>
-      <h2>👥 Enter Player Names</h2>
+      <h2>👥 Enter Player Names:</h2>
       <input
         placeholder="Player 1 Name"
         value={player1}
