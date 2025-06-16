@@ -131,7 +131,7 @@ export default function Home() {
                   onClick={() => setSelectedPiece(piece)}
                   style={{
                     padding: 5,
-                    border: isSelected ? "3px solid blue" : "2px solid #aaa",
+                    border: isSelected ? "3px solid gold" : "2px solid #aaa",
                     borderRadius: 4,
                     margin: "4px",
                     cursor: "pointer"
