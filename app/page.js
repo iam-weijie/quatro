@@ -1,103 +1,168 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState } from "react";
+
+const BOARD_SIZE = 4;
+const COLORS = ["white", "black"];
+const SHAPES = ["circle", "square"];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [board, setBoard] = useState(
+    Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null))
+  );
+  const [turn, setTurn] = useState("P1");
+  const [selectedPiece, setSelectedPiece] = useState(null);
+  const [winner, setWinner] = useState(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  function shareTrait(pieces) {
+    if (pieces.includes(null)) return false;
+    const sameColor = pieces.every((p) => p.color === pieces[0].color);
+    const sameShape = pieces.every((p) => p.shape === pieces[0].shape);
+    return sameColor || sameShape;
+  }
+
+  function checkWin(r, c) {
+    const directions = [
+      [...Array(BOARD_SIZE).keys()].map((i) => [r, i]),
+      [...Array(BOARD_SIZE).keys()].map((i) => [i, c]),
+      [...Array(BOARD_SIZE).keys()].map((i) => [i, i]),
+      [...Array(BOARD_SIZE).keys()].map((i) => [i, BOARD_SIZE - 1 - i]),
+    ];
+
+    for (let line of directions) {
+      const pieces = line.map(([x, y]) => board[x][y]);
+      if (shareTrait(pieces)) return true;
+    }
+
+    const blocks = [];
+    if (r > 0 && c > 0) blocks.push([[r - 1, c - 1], [r - 1, c], [r, c - 1], [r, c]]);
+    if (r > 0 && c < BOARD_SIZE - 1) blocks.push([[r - 1, c], [r - 1, c + 1], [r, c], [r, c + 1]]);
+    if (r < BOARD_SIZE - 1 && c > 0) blocks.push([[r, c - 1], [r, c], [r + 1, c - 1], [r + 1, c]]);
+    if (r < BOARD_SIZE - 1 && c < BOARD_SIZE - 1) blocks.push([[r, c], [r, c + 1], [r + 1, c], [r + 1, c + 1]]);
+
+    for (let block of blocks) {
+      const pieces = block.map(([x, y]) => board[x][y]);
+      if (shareTrait(pieces)) return true;
+    }
+
+    return false;
+  }
+
+  function handleCellClick(r, c) {
+    if (winner || !selectedPiece || board[r][c]) return;
+    const newBoard = board.map((row) => row.slice());
+    newBoard[r][c] = selectedPiece;
+    setBoard(newBoard);
+
+    if (checkWin(r, c)) {
+      setWinner(turn);
+      return;
+    }
+
+    if (newBoard.flat().every((cell) => cell !== null)) {
+      setWinner("Draw");
+      return;
+    }
+
+    setTurn(turn === "P1" ? "P2" : "P1");
+    setSelectedPiece(null);
+  }
+
+  function renderPiece({ color, shape }) {
+    const base = {
+      display: "inline-block",
+      width: 30,
+      height: 30,
+      margin: 5,
+      border: "2px solid black",
+      backgroundColor: color,
+    };
+    return shape === "circle"
+      ? <div style={{ ...base, borderRadius: "50%" }} />
+      : <div style={{ ...base }} />;
+  }
+
+  return (
+    <div style={{ fontFamily: "sans-serif", maxWidth: 400, margin: "20px auto", textAlign: "center" }}>
+      <h1>Quatro</h1>
+      <h3>{winner ? (winner === "Draw" ? "It's a draw!" : `${winner} wins! 🎉`) : `${turn}'s turn`}</h3>
+
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${BOARD_SIZE}, 50px)`,
+        gap: 4,
+        justifyContent: "center",
+        margin: "20px 0"
+      }}>
+        {board.map((row, r) =>
+          row.map((cell, c) => (
+            <div
+              key={`${r}-${c}`}
+              onClick={() => handleCellClick(r, c)}
+              style={{
+                width: 50,
+                height: 50,
+                backgroundColor: "#eee",
+                border: "2px solid #333",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                cursor: cell || winner ? "default" : "pointer"
+              }}
+            >
+              {cell && renderPiece(cell)}
+            </div>
+          ))
+        )}
+      </div>
+
+      <div>
+        <p>Select a piece:</p>
+        <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
+          {COLORS.map((color) =>
+            SHAPES.map((shape) => {
+              const piece = { color, shape };
+              const isSelected = selectedPiece &&
+                selectedPiece.color === color &&
+                selectedPiece.shape === shape;
+              return (
+                <div
+                  key={`${color}-${shape}`}
+                  onClick={() => setSelectedPiece(piece)}
+                  style={{
+                    padding: 5,
+                    border: isSelected ? "3px solid blue" : "2px solid #aaa",
+                    borderRadius: 4,
+                    margin: "4px",
+                    cursor: "pointer"
+                  }}
+                >
+                  {renderPiece(piece)}
+                </div>
+              );
+            })
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+
+      {winner && (
+        <button
+          onClick={() => {
+            setBoard(Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null)));
+            setWinner(null);
+            setTurn("P1");
+            setSelectedPiece(null);
+          }}
+          style={{
+            marginTop: 15,
+            padding: "8px 16px",
+            fontSize: 16,
+            cursor: "pointer"
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          Restart Game
+        </button>
+      )}
     </div>
   );
 }
