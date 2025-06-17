@@ -1,4 +1,4 @@
-Toun the development server:
+To run the development server:
 
 ```bash
 npm run dev
