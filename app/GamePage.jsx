@@ -6,11 +6,11 @@ const BOARD_SIZE = 4;
 const COLORS = ["white", "black"];
 const SHAPES = ["circle", "square"];
 
-export default function Home() {
+export default function GamePage({ player1, player2 }) {
   const [board, setBoard] = useState(
     Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null))
   );
-  const [turn, setTurn] = useState("P1");
+  const [turn, setTurn] = useState(player1);
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [winner, setWinner] = useState(null);
 
@@ -77,7 +77,7 @@ export default function Home() {
       return;
     }
 
-    setTurn(turn === "P1" ? "P2" : "P1");
+    setTurn(turn === player1 ? player2 : player1);
     setSelectedPiece(null);
   }
 
@@ -163,7 +163,7 @@ export default function Home() {
           onClick={() => {
             setBoard(Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null)));
             setWinner(null);
-            setTurn("P1");
+            setTurn(player1);
             setSelectedPiece(null);
           }}
           style={{
