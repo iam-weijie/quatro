@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Quatro",
-  description: "Board game with 4 diff pieces",
+  description: "Chess game with 4 diff pieces",
 };
 
 export default function RootLayout({ children }) {
